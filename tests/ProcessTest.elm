@@ -19,10 +19,11 @@ suite =
                         (processDocument
                             { title = "The title"
                             , sections =
-                                [ { title = "html", mainContent = Just (Code (Just "html") "<div>hi!</div>"), secondaryContent = Dict.empty }
+                                [ { title = "message", mainContent = Just (Text "hello!"), secondaryContent = Dict.empty }
+                                , { title = "html", mainContent = Just (Code (Just "html") "<div>{{ message }}</div>"), secondaryContent = Dict.empty }
                                 ]
                             }
                         )
-                        (Dict.fromList [ ( "html", Ok (Code (Just "html") "<div>hi!</div>") ) ])
+                        (Dict.fromList [ ("message", Ok (Text "hello!")), ( "html", Ok (Code (Just "html") "<div>hello!</div>") ) ])
             ]
         ]
