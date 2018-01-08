@@ -93,6 +93,25 @@ suite =
                             ]
                          }
                         )
+            , test "Section with text content" <|
+                \() ->
+                    Expect.equal (parseDocument """
+# The title
+
+## First
+
+Blah blah blah
+""")
+                        ({ title = "The title"
+                         , sections =
+                            [ { title = "First"
+                              , mainContent =
+                                    Just (Text "Blah blah blah")
+                              , secondaryContent = Dict.empty
+                              }
+                            ]
+                         }
+                        )
             , test "Section with code content" <|
                 \() ->
                     Expect.equal (parseDocument """

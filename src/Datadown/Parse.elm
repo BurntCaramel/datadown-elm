@@ -111,7 +111,13 @@ processDocumentBlock block document =
                 addContentToDocument code document
 
         _ ->
-            document
+            case processContentBlock block of
+              Just content ->
+                addContentToDocument content document
+              
+              Nothing ->
+                document
+              
 
 
 {-| Parses a Datadown document
