@@ -25,7 +25,7 @@ suite =
                             }
                         )
                         (Dict.fromList [ ("message", Ok (Text "hello!")), ( "html", Ok (Code (Just "html") "<div>hello!</div>") ) ])
-            , test "HTML with two variables" <|
+            , test "HTML with two levels of variables" <|
                 \() ->
                     Expect.equal
                         (processDocument

@@ -1,6 +1,6 @@
 {
     "version": "1.0.0",
-    "summary": "Format data flow using Markdown",
+    "summary": "Data flow and templates using Markdown",
     "repository": "https://github.com/RoyalIcing/datadown-elm.git",
     "license": "BSD3",
     "source-directories": [
