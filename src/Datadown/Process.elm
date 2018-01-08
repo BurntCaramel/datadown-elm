@@ -39,11 +39,12 @@ processSection section prevResults =
             case section.title of
                 "html" ->
                     processHTMLSection section prevResults
-                
+
                 _ ->
                     Err UnknownKind
     in
         Dict.insert section.title result prevResults
+
 
 {-| Process a document and return a result
 -}
@@ -51,4 +52,3 @@ processDocument : Document -> Dict String (Result Error Content)
 processDocument document =
     document.sections
         |> List.foldl processSection Dict.empty
-    

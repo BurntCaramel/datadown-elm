@@ -80,18 +80,20 @@ suite =
                         ({ title = "The title"
                          , sections =
                             [ { title = "First"
-                              , mainContent = Just (List
-                                [ Text "1st"
-                                , Text "2nd"
-                                , Text "3rd"
-                                ]
-                                )
+                              , mainContent =
+                                    Just
+                                        (List
+                                            [ Text "1st"
+                                            , Text "2nd"
+                                            , Text "3rd"
+                                            ]
+                                        )
                               , secondaryContent = Dict.empty
                               }
                             ]
                          }
                         )
-                    , test "Section with code content" <|
+            , test "Section with code content" <|
                 \() ->
                     Expect.equal (parseDocument """
 # The title
@@ -105,9 +107,10 @@ export default 42;
                         ({ title = "The title"
                          , sections =
                             [ { title = "First"
-                              , mainContent = Just (Code (Just "js") """export default 42;
-"""
-                                )
+                              , mainContent =
+                                    Just
+                                        (Code (Just "js") """export default 42;
+""")
                               , secondaryContent = Dict.empty
                               }
                             ]
