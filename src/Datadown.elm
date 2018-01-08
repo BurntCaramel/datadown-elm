@@ -30,6 +30,5 @@ type alias Section =
 -}
 type alias Document =
     { title : String
-    , properties : Dict String String
     , sections : List Section
     }

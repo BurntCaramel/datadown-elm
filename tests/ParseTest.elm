@@ -17,11 +17,11 @@ suite =
                 \() ->
                     Expect.equal (parseDocument """
 # The title
-""") ({ title = "The title", properties = Dict.empty, sections = [] })
+""") ({ title = "The title", sections = [] })
             , test "No title" <|
                 \() ->
                     Expect.equal (parseDocument """
-""") ({ title = "", properties = Dict.empty, sections = [] })
+""") ({ title = "", sections = [] })
             ]
         , describe "Sections"
             [ test "Single section with title" <|
@@ -32,7 +32,6 @@ suite =
 ## First
 """)
                         ({ title = "The title"
-                         , properties = Dict.empty
                          , sections =
                             [ { title = "First"
                               , mainContent = Nothing
@@ -51,7 +50,6 @@ suite =
 ## Third
 """)
                         ({ title = "The title"
-                         , properties = Dict.empty
                          , sections =
                             [ { title = "First"
                               , mainContent = Nothing
@@ -80,7 +78,6 @@ suite =
 - 3rd
 """)
                         ({ title = "The title"
-                         , properties = Dict.empty
                          , sections =
                             [ { title = "First"
                               , mainContent = Just (List
@@ -106,7 +103,6 @@ export default 42;
 ```
 """)
                         ({ title = "The title"
-                         , properties = Dict.empty
                          , sections =
                             [ { title = "First"
                               , mainContent = Just (Code (Just "js") """export default 42;

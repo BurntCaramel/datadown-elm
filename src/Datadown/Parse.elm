@@ -159,7 +159,6 @@ parseDocument input =
   let
     initialDocument =
       { title = ""
-      , properties = Dict.empty
       , sections = []
       }
   in

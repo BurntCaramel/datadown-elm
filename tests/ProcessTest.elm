@@ -16,7 +16,7 @@ suite =
             [ test "HTML" <|
                 \() ->
                     Expect.equal
-                      (processDocument { title = "The title", properties = Dict.empty, sections = [
+                      (processDocument { title = "The title", sections = [
                         { title = "html", mainContent = Just (Code (Just "html") "<div>hi!</div>"), secondaryContent = Dict.empty }
                       ] })
                       (Dict.fromList [ ("html", Ok (Code (Just "html") "<div>hi!</div>") )]) 
