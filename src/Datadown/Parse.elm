@@ -12,6 +12,7 @@ module Datadown.Parse exposing
 
 
 import Datadown exposing (Document, Section)
+import Datadown.Content as Content exposing (Content(..))
 -- import String
 -- import Regex exposing (Regex)
 import Dict
@@ -73,8 +74,37 @@ import Markdown.Inline as Inline exposing (Inline(..))
 parseSection : List (Block b i) -> Section
 parseSection blocks =
   { title = ""
-  , rawContent = ""
+  , mainContent = Nothing
+  , secondaryContent = Dict.empty
   }
+
+processContentBlock : Block b i -> Maybe Content
+processContentBlock block =
+  case block of
+    PlainInlines inlines ->
+      Just (Content.Text (Inline.extractText inlines))
+    
+    Paragraph rawText inlines ->
+      Just (Content.Text (Inline.extractText inlines))
+
+    _ ->
+      Nothing
+
+addContentToDocument : Content -> Document -> Document
+addContentToDocument content document =
+  let    
+    newSections : List Section
+    newSections =
+      case document.sections of
+        [] ->
+          [] -- Error, content must belong to an open section
+
+        section :: sectionsTail ->
+          { section | mainContent = Just content } :: sectionsTail
+  in
+    { document
+    | sections = newSections
+    }
 
 processDocumentBlock : Block b i -> Document -> Document
 processDocumentBlock block document =
@@ -83,9 +113,37 @@ processDocumentBlock block document =
       { document | title = Inline.extractText inlines }
     
     Heading text 2 inlines ->
-      { document
-      | sections = { title = (Inline.extractText inlines), rawContent = "" } :: document.sections
-      }
+      let
+        title : String
+        title =
+          inlines
+            |> Inline.extractText
+            |> String.trim
+      in
+        { document
+        | sections = { title = title, mainContent = Nothing, secondaryContent = Dict.empty } :: document.sections
+        }
+    
+    Block.List listBlock items ->
+      let
+        contentItems : List Content
+        contentItems =
+          List.map (List.filterMap processContentBlock) items
+            |> List.concat
+      in
+        addContentToDocument (Content.List contentItems) document
+
+    CodeBlock codeBlock text ->
+      let
+        code =
+          case codeBlock of
+            Block.Fenced isOpen fence ->
+              Code fence.language text
+            
+            _ ->
+              Code Nothing text
+      in
+        addContentToDocument code document
 
     _ ->
       document
@@ -107,4 +165,5 @@ parseDocument input =
   in
     input
     |> Block.parse Nothing -- using Config.defaultOptions
-    |> List.foldr processDocumentBlock initialDocument
+    |> List.foldl processDocumentBlock initialDocument
+    |> \d -> { d | sections = d.sections |> List.reverse }
