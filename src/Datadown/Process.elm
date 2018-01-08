@@ -59,9 +59,12 @@ stringResolverForResults results =
             _ ->
                 Nothing
 
-processHTMLSection : (String -> Maybe String) -> Section -> Result Error Content
-processHTMLSection resolve section =
+processSection : (String -> Maybe String) -> Section -> Result Error Content
+processSection resolve section =
     case section.mainContent of
+        Just (Text text) ->
+            Ok (Text (mustache resolve text))
+
         Just (Code language codeText) ->
             Ok (Code language (mustache resolve codeText))
 
@@ -72,8 +75,8 @@ processHTMLSection resolve section =
             Err Invalid
 
 
-processSection : Section -> Dict String (Result Error Content) -> Dict String (Result Error Content)
-processSection section prevResults =
+foldProcessedSections : Section -> Dict String (Result Error Content) -> Dict String (Result Error Content)
+foldProcessedSections section prevResults =
     let
         resolve : String -> Maybe String
         resolve =
@@ -81,18 +84,7 @@ processSection section prevResults =
 
         result : Result Error Content
         result =
-            case section.title of
-                "html" ->
-                    processHTMLSection resolve section
-
-                _ ->
-                    case section.mainContent of
-                        Just content ->
-                            Ok content
-
-                        Nothing ->
-                            Err NoContent
-                    -- Result.fromMaybe (Err NoContent) section.mainContent
+            processSection resolve section
     in
         Dict.insert section.title result prevResults
 
@@ -102,4 +94,4 @@ processSection section prevResults =
 processDocument : Document -> Dict String (Result Error Content)
 processDocument document =
     document.sections
-        |> List.foldl processSection Dict.empty
+        |> List.foldl foldProcessedSections Dict.empty
