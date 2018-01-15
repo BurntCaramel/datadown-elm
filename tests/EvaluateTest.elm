@@ -1,11 +1,11 @@
-module RunTest exposing (..)
+module EvaluateTest exposing (..)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 import Expect
 import Datadown.Tokenize exposing (..)
-import Datadown.Run exposing (..)
+import Datadown.Evaluate exposing (..)
 
 
 resolveIdentifier : String -> Maybe Value
