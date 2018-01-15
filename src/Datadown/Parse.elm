@@ -32,7 +32,7 @@ import Markdown.Inline as Inline exposing (Inline(..))
     """
 
 -}
-parseSection : List (Block b i) -> Section
+parseSection : List (Block b i) -> Section a
 parseSection blocks =
     { title = ""
     , mainContent = Nothing
@@ -40,7 +40,7 @@ parseSection blocks =
     }
 
 
-processContentBlock : Block b i -> Maybe Content
+processContentBlock : Block b i -> Maybe (Content a)
 processContentBlock block =
     case block of
         PlainInlines inlines ->
@@ -53,10 +53,10 @@ processContentBlock block =
             Nothing
 
 
-addContentToDocument : Content -> Document -> Document
+addContentToDocument : Content a -> Document a -> Document a
 addContentToDocument content document =
     let
-        newSections : List Section
+        newSections : List (Section a)
         newSections =
             case document.sections of
                 [] ->
@@ -71,8 +71,8 @@ addContentToDocument content document =
         }
 
 
-processDocumentBlock : Block b i -> Document -> Document
-processDocumentBlock block document =
+processDocumentBlock : (String -> a) -> Block b i -> Document a -> Document a
+processDocumentBlock parseExpressions block document =
     case block of
         Heading text 1 inlines ->
             { document | title = Inline.extractText inlines }
@@ -91,7 +91,7 @@ processDocumentBlock block document =
 
         Block.List listBlock items ->
             let
-                contentItems : List Content
+                contentItems : List (Content a)
                 contentItems =
                     List.map (List.filterMap processContentBlock) items
                         |> List.concat
@@ -100,9 +100,9 @@ processDocumentBlock block document =
 
         BlockQuote blocks ->
             let
-                innerDocument : Document
+                innerDocument : Document a
                 innerDocument =
-                    processDocument blocks
+                    processDocument parseExpressions blocks
             in
                 addContentToDocument (Datadown.Quote innerDocument) document
 
@@ -113,7 +113,7 @@ processDocumentBlock block document =
                         Block.Fenced isOpen fence ->
                             case fence.language of
                                 Nothing ->
-                                    Expressions text
+                                    Expressions (parseExpressions text)
 
                                 _ ->
                                     Code fence.language text
@@ -132,8 +132,8 @@ processDocumentBlock block document =
                     document
 
 
-processDocument : List (Block b i) -> Document
-processDocument blocks =
+processDocument : (String -> a) -> List (Block b i) -> Document a
+processDocument parseExpressions blocks =
     let
         initialDocument =
             { title = ""
@@ -141,7 +141,7 @@ processDocument blocks =
             }
     in
         blocks
-            |> List.foldl processDocumentBlock initialDocument
+            |> List.foldl (processDocumentBlock parseExpressions) initialDocument
             |> \d -> { d | sections = d.sections |> List.reverse }
 
 
@@ -155,9 +155,9 @@ processDocument blocks =
 """
 
 -}
-parseDocument : String -> Document
-parseDocument input =
+parseDocument : (String -> a) -> String -> Document a
+parseDocument parseExpressions input =
     input
         |> Block.parse Nothing
         -- using Config.defaultOptions
-        |> processDocument
+        |> processDocument parseExpressions

@@ -1,12 +1,17 @@
 module Datadown.Process
     exposing
         ( processDocument
+        , Error
         )
 
 {-| Process
 
 
-# Functions
+## Types
+
+@docs Error
+
+## Functions
 
 @docs processDocument
 
@@ -17,10 +22,12 @@ import Regex exposing (Regex)
 import Datadown exposing (Document, Section, Content(..))
 
 
-type Error
-    = Invalid
+{-| Error after processing, possibly from evaluating expressions
+-}
+type Error e
+    = NoContent String
     | UnknownKind
-    | NoContent
+    | Evaluate e
 
 
 mustacheVariableRegex : Regex
@@ -46,7 +53,7 @@ mustache resolveVariable input =
         Regex.replace Regex.All mustacheVariableRegex replacer input
 
 
-stringResolverForResults : Dict String (Result Error Content) -> (String -> Maybe String)
+stringResolverForResults : Dict String (Result (Error e) (Content a)) -> (String -> Maybe String)
 stringResolverForResults results =
     \key ->
         case Dict.get key results of
@@ -62,39 +69,47 @@ stringResolverForResults results =
                 Nothing
 
 
-processSection : (String -> Maybe String) -> Section -> Result Error Content
-processSection resolve section =
+processSection : (String -> Maybe String) -> (a -> Result e a) -> Section a -> Result (Error e) (Content a)
+processSection resolve evaluateExpressions section =
     case section.mainContent of
         Just (Text text) ->
             Ok (Text (mustache resolve text))
 
         Just (Code language codeText) ->
             Ok (Code language (mustache resolve codeText))
+        
+        Just (Expressions input) ->
+            case evaluateExpressions input of
+                Ok output ->
+                    Ok (Expressions output)
+                
+                Err error ->
+                    Err (Evaluate error)
 
         Just content ->
             Ok content
 
         Nothing ->
-            Err Invalid
+            Err (NoContent section.title)
 
 
-foldProcessedSections : Section -> Dict String (Result Error Content) -> Dict String (Result Error Content)
-foldProcessedSections section prevResults =
+foldProcessedSections : (a -> Result e a) -> Section a -> Dict String (Result (Error e) (Content a)) -> Dict String (Result (Error e) (Content a))
+foldProcessedSections evaluateExpressions section prevResults =
     let
         resolve : String -> Maybe String
         resolve =
             stringResolverForResults prevResults
 
-        result : Result Error Content
+        result : Result (Error e) (Content a)
         result =
-            processSection resolve section
+            processSection resolve evaluateExpressions section
     in
         Dict.insert section.title result prevResults
 
 
 {-| Process a document and return a result
 -}
-processDocument : Document -> Dict String (Result Error Content)
-processDocument document =
+processDocument : (a -> Result e a) -> Document a -> Dict String (Result (Error e) (Content a))
+processDocument evaluateExpressions document =
     document.sections
-        |> List.foldl foldProcessedSections Dict.empty
+        |> List.foldl (foldProcessedSections evaluateExpressions) Dict.empty

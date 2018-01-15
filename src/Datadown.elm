@@ -19,26 +19,26 @@ import Dict exposing (Dict)
 
 {-| Content, such as plain text, code, lists, etc
 -}
-type Content
+type Content a
     = Text String
     | Code (Maybe String) String -- ```html
-    | Expressions String -- ```
-    | List (List Content) -- -
-    | Quote Document -- >
+    | Expressions a -- ```
+    | List (List (Content a)) -- -
+    | Quote (Document a) -- >
 
 
 {-| A section of data
 -}
-type alias Section =
+type alias Section a =
     { title : String
-    , mainContent : Maybe Content
-    , secondaryContent : Dict String Content
+    , mainContent : Maybe (Content a)
+    , secondaryContent : Dict String (Content a)
     }
 
 
 {-| A full document, with many sections
 -}
-type alias Document =
+type alias Document a =
     { title : String
-    , sections : List Section
+    , sections : List (Section a)
     }

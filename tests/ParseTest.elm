@@ -15,20 +15,20 @@ suite =
         [ describe "Parsing documents"
             [ test "Title" <|
                 \_ ->
-                    parseDocument """
+                    parseDocument identity """
 # The title
 """
                         |> Expect.equal { title = "The title", sections = [] }
             , test "No title" <|
                 \_ ->
-                    parseDocument """
+                    parseDocument identity """
 """
                         |> Expect.equal { title = "", sections = [] }
             ]
         , describe "Sections"
             [ test "Single section with title" <|
                 \_ ->
-                    parseDocument """
+                    parseDocument identity """
 # The title
 
 ## First
@@ -44,7 +44,7 @@ suite =
                             }
             , test "Multiple sections with titles" <|
                 \_ ->
-                    parseDocument """
+                    parseDocument identity """
 # The title
 
 ## First
@@ -70,7 +70,7 @@ suite =
                             }
             , test "Section with list content" <|
                 \_ ->
-                    parseDocument """
+                    parseDocument identity """
 # The title
 
 ## First
@@ -97,7 +97,7 @@ suite =
                             }
             , test "Section with text content" <|
                 \_ ->
-                    parseDocument """
+                    parseDocument identity """
 # The title
 
 ## First
@@ -116,7 +116,7 @@ Blah blah blah
                             }
             , test "Section with code content" <|
                 \_ ->
-                    parseDocument """
+                    parseDocument identity """
 # The title
 
 ## First
@@ -139,7 +139,7 @@ export default 42;
                             }
             , test "Section with expressions" <|
                 \_ ->
-                    parseDocument """
+                    parseDocument identity """
 # The title
 
 ## First
@@ -162,7 +162,7 @@ export default 42;
                             }
             , test "Section with block quote" <|
                 \_ ->
-                    parseDocument """
+                    parseDocument identity """
 # The title
 
 ## First
