@@ -3,10 +3,10 @@ module Datadown.Process
         ( processDocument
         )
 
-{-| Content
+{-| Process
 
 
-# Types
+# Functions
 
 @docs processDocument
 
@@ -25,7 +25,9 @@ type Error
 
 
 mustacheVariableRegex : Regex
-mustacheVariableRegex = Regex.regex "{{\\s?(.+?)\\s?}}"
+mustacheVariableRegex =
+    Regex.regex "{{\\s?(.+?)\\s?}}"
+
 
 mustache : (String -> Maybe String) -> String -> String
 mustache resolveVariable input =
@@ -33,10 +35,11 @@ mustache resolveVariable input =
         replacer : Regex.Match -> String
         replacer match =
             let
-                key = match.submatches
-                    |> List.head
-                    |> Maybe.withDefault Nothing
-                    |> Maybe.withDefault ""
+                key =
+                    match.submatches
+                        |> List.head
+                        |> Maybe.withDefault Nothing
+                        |> Maybe.withDefault ""
             in
                 resolveVariable key
                     |> Maybe.withDefault ""
@@ -52,12 +55,13 @@ stringResolverForResults results =
                 case result of
                     Text text ->
                         Just text
-                    
+
                     _ ->
                         Nothing
-            
+
             _ ->
                 Nothing
+
 
 processSection : (String -> Maybe String) -> Section -> Result Error Content
 processSection resolve section =
@@ -70,7 +74,7 @@ processSection resolve section =
 
         Just content ->
             Ok content
-        
+
         Nothing ->
             Err Invalid
 

@@ -24,7 +24,7 @@ suite =
                                 ]
                             }
                         )
-                        (Dict.fromList [ ("message", Ok (Text "hello!")), ( "html", Ok (Code (Just "html") "<div>hello!</div>") ) ])
+                        (Dict.fromList [ ( "message", Ok (Text "hello!") ), ( "html", Ok (Code (Just "html") "<div>hello!</div>") ) ])
             , test "HTML with two levels of variables" <|
                 \() ->
                     Expect.equal
@@ -37,6 +37,6 @@ suite =
                                 ]
                             }
                         )
-                        (Dict.fromList [ ("firstName", Ok (Text "Jane")), ("message", Ok (Text "hello Jane!")), ( "html", Ok (Code (Just "html") "<div>hello Jane!</div>") ) ])
+                        (Dict.fromList [ ( "firstName", Ok (Text "Jane") ), ( "message", Ok (Text "hello Jane!") ), ( "html", Ok (Code (Just "html") "<div>hello Jane!</div>") ) ])
             ]
         ]

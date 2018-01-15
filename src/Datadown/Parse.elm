@@ -19,6 +19,7 @@ import Dict
 import Markdown.Block as Block exposing (Block(..))
 import Markdown.Inline as Inline exposing (Inline(..))
 
+
 {-| Parses a Datadown section
 
     parseSection """
@@ -112,12 +113,11 @@ processDocumentBlock block document =
 
         _ ->
             case processContentBlock block of
-              Just content ->
-                addContentToDocument content document
-              
-              Nothing ->
-                document
-              
+                Just content ->
+                    addContentToDocument content document
+
+                Nothing ->
+                    document
 
 
 {-| Parses a Datadown document
