@@ -17,11 +17,16 @@ suite =
                     Expect.equal
                         (run identifier "abc")
                         (Ok (Identifier "abc"))
-            , test "operator" <|
+            , test "add operator" <|
                 \_ ->
                     Expect.equal
                         (run operator "+")
                         (Ok (Operator Add))
+            , test "subtract operator" <|
+                \_ ->
+                    Expect.equal
+                        (run operator "-")
+                        (Ok (Operator Subtract))
             , test "token identifier" <|
                 \_ ->
                     Expect.equal

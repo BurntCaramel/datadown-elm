@@ -14,8 +14,7 @@ module Datadown.Process
 
 import Dict exposing (Dict(..))
 import Regex exposing (Regex)
-import Datadown exposing (Document, Section)
-import Datadown.Content exposing (Content(..))
+import Datadown exposing (Document, Section, Content(..))
 
 
 type Error

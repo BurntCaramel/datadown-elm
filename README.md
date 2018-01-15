@@ -11,11 +11,11 @@ Parse Datadown content.
 ## classes:
 - btn
 - btn-primary
-? @tags.primary
+-? tags.primary
 - btn-secondary
-? @tags.secondary
+-? tags.secondary
 - btn-large
-? @tags.large
+-? tags.large
 
 
 ## primitive:
@@ -24,14 +24,7 @@ Parse Datadown content.
 
 
 ## html:
-\`\`\`handlebars
+\`\`\`mustache
 <button class="{{ classes }}">{{ content }}</button>
 \`\`\`
-```
-
-## Basic usage
-
-```elm
-primaryButton = "Click me #button #primary"
-primaryButtonLofi = Lofi.parseElement primaryButton
 ```

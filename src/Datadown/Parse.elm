@@ -13,8 +13,7 @@ module Datadown.Parse
 
 -}
 
-import Datadown exposing (Document, Section)
-import Datadown.Content as Content exposing (Content(..))
+import Datadown exposing (Document, Section, Content(..))
 import Dict
 import Markdown.Block as Block exposing (Block(..))
 import Markdown.Inline as Inline exposing (Inline(..))
@@ -45,10 +44,10 @@ processContentBlock : Block b i -> Maybe Content
 processContentBlock block =
     case block of
         PlainInlines inlines ->
-            Just (Content.Text (Inline.extractText inlines))
+            Just (Datadown.Text (Inline.extractText inlines))
 
         Paragraph rawText inlines ->
-            Just (Content.Text (Inline.extractText inlines))
+            Just (Datadown.Text (Inline.extractText inlines))
 
         _ ->
             Nothing
@@ -97,14 +96,27 @@ processDocumentBlock block document =
                     List.map (List.filterMap processContentBlock) items
                         |> List.concat
             in
-                addContentToDocument (Content.List contentItems) document
+                addContentToDocument (Datadown.List contentItems) document
+
+        BlockQuote blocks ->
+            let
+                innerDocument : Document
+                innerDocument =
+                    processDocument blocks
+            in
+                addContentToDocument (Datadown.Quote innerDocument) document
 
         CodeBlock codeBlock text ->
             let
                 code =
                     case codeBlock of
                         Block.Fenced isOpen fence ->
-                            Code fence.language text
+                            case fence.language of
+                                Nothing ->
+                                    Expressions text
+
+                                _ ->
+                                    Code fence.language text
 
                         _ ->
                             Code Nothing text
@@ -120,6 +132,19 @@ processDocumentBlock block document =
                     document
 
 
+processDocument : List (Block b i) -> Document
+processDocument blocks =
+    let
+        initialDocument =
+            { title = ""
+            , sections = []
+            }
+    in
+        blocks
+            |> List.foldl processDocumentBlock initialDocument
+            |> \d -> { d | sections = d.sections |> List.reverse }
+
+
 {-| Parses a Datadown document
 
     parseDocument """
@@ -132,14 +157,7 @@ processDocumentBlock block document =
 -}
 parseDocument : String -> Document
 parseDocument input =
-    let
-        initialDocument =
-            { title = ""
-            , sections = []
-            }
-    in
-        input
-            |> Block.parse Nothing
-            -- using Config.defaultOptions
-            |> List.foldl processDocumentBlock initialDocument
-            |> \d -> { d | sections = d.sections |> List.reverse }
+    input
+        |> Block.parse Nothing
+        -- using Config.defaultOptions
+        |> processDocument

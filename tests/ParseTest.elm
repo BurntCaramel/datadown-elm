@@ -5,7 +5,7 @@ import Fuzz exposing (Fuzzer, int, list, string)
 import Test exposing (..)
 import Expect
 import Dict
-import Datadown.Content exposing (Content(..))
+import Datadown exposing (Content(..))
 import Datadown.Parse exposing (parseDocument, parseSection)
 
 
@@ -133,6 +133,61 @@ export default 42;
                                         Just
                                             (Code (Just "js") """export default 42;
 """)
+                                  , secondaryContent = Dict.empty
+                                  }
+                                ]
+                            }
+            , test "Section with expressions" <|
+                \_ ->
+                    parseDocument """
+# The title
+
+## First
+
+```
+5 + 7
+```
+"""
+                        |> Expect.equal
+                            { title = "The title"
+                            , sections =
+                                [ { title = "First"
+                                  , mainContent =
+                                        Just
+                                            (Expressions """5 + 7
+""")
+                                  , secondaryContent = Dict.empty
+                                  }
+                                ]
+                            }
+            , test "Section with block quote" <|
+                \_ ->
+                    parseDocument """
+# The title
+
+## First
+
+> ## Inner section
+> Blah blah blah
+"""
+                        |> Expect.equal
+                            { title = "The title"
+                            , sections =
+                                [ { title = "First"
+                                  , mainContent =
+                                        Just
+                                            (Quote
+                                                ({ title = ""
+                                                 , sections =
+                                                    [ { title = "Inner section"
+                                                      , mainContent =
+                                                            Just (Text "Blah blah blah")
+                                                      , secondaryContent = Dict.empty
+                                                      }
+                                                    ]
+                                                 }
+                                                )
+                                            )
                                   , secondaryContent = Dict.empty
                                   }
                                 ]

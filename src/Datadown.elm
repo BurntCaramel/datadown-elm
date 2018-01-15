@@ -2,6 +2,7 @@ module Datadown
     exposing
         ( Document
         , Section
+        , Content(..)
         )
 
 {-| A library for Datadown parsing
@@ -9,12 +10,21 @@ module Datadown
 
 # Types
 
-@docs Document, Section
+@docs Document, Section, Content
 
 -}
 
 import Dict exposing (Dict)
-import Datadown.Content exposing (Content)
+
+
+{-| Content, such as plain text, code, lists, etc
+-}
+type Content
+    = Text String
+    | Code (Maybe String) String -- ```html
+    | Expressions String -- ```
+    | List (List Content) -- -
+    | Quote Document -- >
 
 
 {-| A section of data
