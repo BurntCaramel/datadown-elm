@@ -14,61 +14,63 @@ suite =
     describe "Parsing"
         [ describe "Parsing documents"
             [ test "Title" <|
-                \() ->
-                    Expect.equal (parseDocument """
+                \_ ->
+                    parseDocument """
 # The title
-""") ({ title = "The title", sections = [] })
+"""
+                        |> Expect.equal { title = "The title", sections = [] }
             , test "No title" <|
-                \() ->
-                    Expect.equal (parseDocument """
-""") ({ title = "", sections = [] })
+                \_ ->
+                    parseDocument """
+"""
+                        |> Expect.equal { title = "", sections = [] }
             ]
         , describe "Sections"
             [ test "Single section with title" <|
-                \() ->
-                    Expect.equal (parseDocument """
+                \_ ->
+                    parseDocument """
 # The title
 
 ## First
-""")
-                        ({ title = "The title"
-                         , sections =
-                            [ { title = "First"
-                              , mainContent = Nothing
-                              , secondaryContent = Dict.empty
-                              }
-                            ]
-                         }
-                        )
+"""
+                        |> Expect.equal
+                            { title = "The title"
+                            , sections =
+                                [ { title = "First"
+                                  , mainContent = Nothing
+                                  , secondaryContent = Dict.empty
+                                  }
+                                ]
+                            }
             , test "Multiple sections with titles" <|
-                \() ->
-                    Expect.equal (parseDocument """
+                \_ ->
+                    parseDocument """
 # The title
 
 ## First
 ## Second
 ## Third
-""")
-                        ({ title = "The title"
-                         , sections =
-                            [ { title = "First"
-                              , mainContent = Nothing
-                              , secondaryContent = Dict.empty
-                              }
-                            , { title = "Second"
-                              , mainContent = Nothing
-                              , secondaryContent = Dict.empty
-                              }
-                            , { title = "Third"
-                              , mainContent = Nothing
-                              , secondaryContent = Dict.empty
-                              }
-                            ]
-                         }
-                        )
+"""
+                        |> Expect.equal
+                            { title = "The title"
+                            , sections =
+                                [ { title = "First"
+                                  , mainContent = Nothing
+                                  , secondaryContent = Dict.empty
+                                  }
+                                , { title = "Second"
+                                  , mainContent = Nothing
+                                  , secondaryContent = Dict.empty
+                                  }
+                                , { title = "Third"
+                                  , mainContent = Nothing
+                                  , secondaryContent = Dict.empty
+                                  }
+                                ]
+                            }
             , test "Section with list content" <|
-                \() ->
-                    Expect.equal (parseDocument """
+                \_ ->
+                    parseDocument """
 # The title
 
 ## First
@@ -76,45 +78,45 @@ suite =
 - 1st
 - 2nd
 - 3rd
-""")
-                        ({ title = "The title"
-                         , sections =
-                            [ { title = "First"
-                              , mainContent =
-                                    Just
-                                        (List
-                                            [ Text "1st"
-                                            , Text "2nd"
-                                            , Text "3rd"
-                                            ]
-                                        )
-                              , secondaryContent = Dict.empty
-                              }
-                            ]
-                         }
-                        )
+"""
+                        |> Expect.equal
+                            { title = "The title"
+                            , sections =
+                                [ { title = "First"
+                                  , mainContent =
+                                        Just
+                                            (List
+                                                [ Text "1st"
+                                                , Text "2nd"
+                                                , Text "3rd"
+                                                ]
+                                            )
+                                  , secondaryContent = Dict.empty
+                                  }
+                                ]
+                            }
             , test "Section with text content" <|
-                \() ->
-                    Expect.equal (parseDocument """
+                \_ ->
+                    parseDocument """
 # The title
 
 ## First
 
 Blah blah blah
-""")
-                        ({ title = "The title"
-                         , sections =
-                            [ { title = "First"
-                              , mainContent =
-                                    Just (Text "Blah blah blah")
-                              , secondaryContent = Dict.empty
-                              }
-                            ]
-                         }
-                        )
+"""
+                        |> Expect.equal
+                            { title = "The title"
+                            , sections =
+                                [ { title = "First"
+                                  , mainContent =
+                                        Just (Text "Blah blah blah")
+                                  , secondaryContent = Dict.empty
+                                  }
+                                ]
+                            }
             , test "Section with code content" <|
-                \() ->
-                    Expect.equal (parseDocument """
+                \_ ->
+                    parseDocument """
 # The title
 
 ## First
@@ -122,18 +124,18 @@ Blah blah blah
 ```js
 export default 42;
 ```
+"""
+                        |> Expect.equal
+                            { title = "The title"
+                            , sections =
+                                [ { title = "First"
+                                  , mainContent =
+                                        Just
+                                            (Code (Just "js") """export default 42;
 """)
-                        ({ title = "The title"
-                         , sections =
-                            [ { title = "First"
-                              , mainContent =
-                                    Just
-                                        (Code (Just "js") """export default 42;
-""")
-                              , secondaryContent = Dict.empty
-                              }
-                            ]
-                         }
-                        )
+                                  , secondaryContent = Dict.empty
+                                  }
+                                ]
+                            }
             ]
         ]
